@@ -18,7 +18,9 @@ import {
 
 import { 
   Account,
+  Balance,
   CollateralManager,
+  Position
 } from "../generated/schema"
 
 import {
@@ -64,6 +66,32 @@ function getAccount(address: Address): Account {
 
 }
 
+function getPosition(collateralManager: CollateralManager, id: BigInt): Position {
+	let positionId = collateralManager.id.concat('-').concat(id.toHex())
+	let position = Position.load(positionId)
+	if (position == null) {
+		position = new Position(positionId)
+		position.collateralManager  = collateralManager.address
+		position.number             = id
+		position.totalSupply        = constants.BIGINT_ZERO
+	}
+	return position as Position
+}
+
+function getBalance(position: Position, account: Account): Balance {
+
+  let balanceid = position.id.concat('-').concat(account.id);
+  let balance = Balance.load(balanceid);
+  if (balance == null) {
+    balance = new Balance(balanceid);
+    balance.position = position.id;
+    balance.account = account.id;
+    balance.value = constants.BIGINT_ZERO;
+  }
+
+  return balance as Balance
+
+}
 
 export function handleApprovalForAll(event: ApprovalForAll): void { }
 
@@ -71,6 +99,41 @@ export function handleBuild(event: Build): void { }
 
 export function handleLiquidate(event: Liquidate): void {}
 
+function registerTransfer(
+	collateral:   CollateralManager,
+  position:     Position,
+	from:         Account,
+	to:           Account,
+	value:        BigInt
+) : void {
+
+	if (from.id == constants.ADDRESS_ZERO) {
+
+		position.totalSupply = integers.increment(position.totalSupply, value)
+
+	} else {
+
+		let balance = getBalance(position, from)
+		balance.value = integers.decrement(balance.value, value)
+		balance.save()
+
+	}
+
+	if (to.id == constants.ADDRESS_ZERO) {
+
+		position.totalSupply = integers.decrement(position.totalSupply, value)
+
+	} else {
+
+		let balance = getBalance(position, to)
+		balance.value = integers.increment(balance.value, value)
+		balance.save()
+
+	}
+
+	position.save()
+
+}
 
 
 export function handleTransferBatch(event: TransferBatch): void { 
@@ -80,9 +143,14 @@ export function handleTransferBatch(event: TransferBatch): void {
 export function handleTransferSingle(event: TransferSingle): void {
 
   let collateralManager = getCollateralManager(event.address)
-  let from              = new Account(event.params.from.toHex())
-	 let to                = new Account(event.params.to.toHex())
+  let from              = getAccount(event.params.from)
+	let to                = getAccount(event.params.to)
 
+  log.info("\n\ncollateral manager: {}\n\n", [collateralManager.id])
+
+  log.info("\n\nfrom: {}\n\n", [from.id])
+
+  log.info("\n\nto: {}\n\n", [to.id])
 
 }
 

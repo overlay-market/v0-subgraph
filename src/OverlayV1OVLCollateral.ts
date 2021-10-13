@@ -17,7 +17,8 @@ import {
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import { 
-  CollateralManager
+  Account,
+  CollateralManager,
 } from "../generated/schema"
 
 import {
@@ -45,6 +46,24 @@ function getCollateralManager(address: Address): CollateralManager {
 
 }
 
+function getAccount(address: Address): Account {
+
+  let accountId = address.toHex()
+  
+  let account = Account.load(accountId)
+
+  if (account == null) {
+    
+    account = new Account(accountId)
+    account.address = address
+    account.save()
+
+  }
+
+  return account
+
+}
+
 
 export function handleApprovalForAll(event: ApprovalForAll): void { }
 
@@ -61,6 +80,9 @@ export function handleTransferBatch(event: TransferBatch): void {
 export function handleTransferSingle(event: TransferSingle): void {
 
   let collateralManager = getCollateralManager(event.address)
+  let from              = new Account(event.params.from.toHex())
+	 let to                = new Account(event.params.to.toHex())
+
 
 }
 

@@ -4,3 +4,18 @@ type ExampleEntity @entity {
   account: Bytes! # address
   operator: Bytes! # address
 }
+type Position @entity {
+  id: ID!
+  number: BigInt!
+  collateralManager: Bytes!
+  market: Bytes!
+  isLong: Boolean!
+  leverage: BigInt!
+  # pricePoint: PricePoint! @derivedFrom(field: "id")
+  oiShares: BigInt!
+  debt: BigInt!
+  cost: BigInt!
+  compounding: BigInt!
+  liquidationPrice: BigDecimal!
+  totalSupply: BigInt!
+}

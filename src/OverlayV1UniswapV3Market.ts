@@ -5,7 +5,6 @@ import {
   NewPrice,
   log
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
-import { ExampleEntity } from "../generated/schema"
 
 export function handleFundingPaid(event: FundingPaid): void { }
 

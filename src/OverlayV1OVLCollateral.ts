@@ -9,10 +9,16 @@ import {
   URI,
   Unwind,
   Update,
-  log,
-  log_addr
 } from "../generated/OverlayV1OVLCollateral/OverlayV1OVLCollateral"
+
+import {
+  OverlayV1UniswapV3Market,
+  FundingPaid,
+  NewPrice
+} from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
+
 import { ExampleEntity } from "../generated/schema"
+
 
 export function handleApprovalForAll(event: ApprovalForAll): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -86,6 +92,6 @@ export function handleUnwind(event: Unwind): void {}
 
 export function handleUpdate(event: Update): void {}
 
-export function handlelog(event: log): void {}
+export function handleFundingPaid(event: FundingPaid): void {}
 
-export function handlelog_addr(event: log_addr): void {}
+export function handleNewPrice(event: NewPrice): void {}

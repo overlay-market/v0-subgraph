@@ -47,4 +47,30 @@ dataSources:
           handler: handlelog
         - event: log_addr(string,address)
           handler: handlelog_addr
-      file: ./src/mapping.ts
+      file: ./src/OverlayV1OVLCollateral.ts
+
+  - kind: ethereum/contract
+    name: OverlayV1UniswapV3Market
+    network: development
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: OverlayV1UniswapV3Market
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FundingPaid
+        - NewPrice
+        - log
+      abis:
+        - name: OverlayV1UniswapV3Market
+          file: ./abis/OverlayV1UniswapV3Market.json
+      eventHandlers:
+        - event: FundingPaid(uint256,uint256,int256)
+          handler: handleFundingPaid
+        - event: NewPrice(uint256,uint256,uint256)
+          handler: handleNewPrice
+        - event: log(string,uint256)
+          handler: handlelog
+      file: ./src/OverlayV1UniswapV3Market.ts

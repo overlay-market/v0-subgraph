@@ -67,15 +67,21 @@ function getAccount(address: Address): Account {
 }
 
 function getPosition(collateralManager: CollateralManager, id: BigInt): Position {
-	let positionId = collateralManager.id.concat('-').concat(id.toHex())
+
+	let positionId = collateralManager.id.concat('-').concat(id.toString())
+
 	let position = Position.load(positionId)
+
 	if (position == null) {
 		position = new Position(positionId)
 		position.collateralManager  = collateralManager.address
 		position.number             = id
 		position.totalSupply        = constants.BIGINT_ZERO
+    position.save()
 	}
+
 	return position as Position
+
 }
 
 function getBalance(position: Position, account: Account): Balance {
@@ -143,10 +149,13 @@ export function handleTransferBatch(event: TransferBatch): void {
 export function handleTransferSingle(event: TransferSingle): void {
 
   let collateralManager = getCollateralManager(event.address)
+  let position          = getPosition(collateralManager, event.params.id)
   let from              = getAccount(event.params.from)
 	let to                = getAccount(event.params.to)
 
   log.info("\n\ncollateral manager: {}\n\n", [collateralManager.id])
+
+  log.info("\n\nposition: {}\n\n", [position.id])
 
   log.info("\n\nfrom: {}\n\n", [from.id])
 

@@ -1,9 +1,3 @@
-type ExampleEntity @entity {
-  id: ID!
-  count: BigInt!
-  account: Bytes! # address
-  operator: Bytes! # address
-}
 type Position @entity {
   id: ID!
   number: BigInt!

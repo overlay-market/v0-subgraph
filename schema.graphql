@@ -13,3 +13,41 @@ type Position @entity {
   liquidationPrice: BigDecimal!
   totalSupply: BigInt!
 }
+
+type CollateralManager @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type Account @entity {
+  id: ID!
+  address: Bytes!
+  # positions: [ Position! ]! @derivedFrom(field: "id")
+}
+
+type PricePoint @entity {
+  id: ID!
+  number: BigInt!
+  bid: BigInt!
+  ask: BigInt!
+  twap: BigInt!
+}
+
+type Market @entity {
+  id: ID!
+  feed: Bytes!
+  base: Bytes!
+  quote: Bytes!
+  baseName: String!
+  quoteName: String!
+  baseSymbol: String!
+  quoteSymbol: String!
+  # prices: [ PricePoint! ]! @derivedFrom(field: "id")
+}
+
+type Balance @entity {
+  id: ID!
+  position: Position!
+  account: Account!
+  value: BigInt!
+}

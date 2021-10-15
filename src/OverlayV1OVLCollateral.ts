@@ -19,7 +19,6 @@ import {
 import { 
   Account,
   Balance,
-  Count,
   CollateralManager,
   MarketMonitor,
   Position
@@ -31,18 +30,6 @@ import {
   integers,
   transactions,
 } from '@amxx/graphprotocol-utils';
-
-function count (): string {
-
-  let count = Count.load('1')
-  if (count == null) count = new Count('1')
-  let the_count = count.count
-  the_count = the_count.plus(BigInt.fromI32(1))
-  count.count = the_count
-  count.save()
-  return count.count.toString()
-
-}
 
 function monitorPosition(market: string, position: Position): void {
 

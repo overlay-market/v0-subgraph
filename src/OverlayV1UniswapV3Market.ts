@@ -7,16 +7,41 @@ import {
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import {
+  OverlayV1OVLCollateral
+} from "../generated/OverlayV1OVLCollateral/OverlayV1OVLCollateral"
+
+import {
+  countPricePoint,
   loadMarket,
   loadMarketManifest,
   loadMarketMonitor,
+  loadPricePoint,
+  morphd
 } from "./utils"
+
+import {
+  Position,
+  PricePoint
+} from "../generated/schema"
 
 export function handleFundingPaid(event: FundingPaid): void { }
 
 export function handleNewPrice(event: NewPrice): void {
 
-  let market = loadMarket(event.address)
+
+  let number = countPricePoint(event.address)
+
+  let pricePoint = loadPricePoint(
+    event.address, 
+    number,
+    false
+  ) as PricePoint
+
+  pricePoint.bid = event.params.bid
+  pricePoint.ask = event.params.ask
+  pricePoint.index = event.params.index
+
+  pricePoint.save()
 
 }
 
@@ -47,6 +72,16 @@ export function handleBlock(block: ethereum.Block): void {
       let positions = monitor.positions
 
       for (let j = 0; j < positions.length; j++) {
+
+        let position = Position.load(positions[j]) as Position
+
+        let collateralManager = OverlayV1OVLCollateral.bind(Address.fromByteArray(position.collateralManager) as Address)
+
+        let marginMaintenance = morphd(collateralManager.marginMaintenance(Address.fromByteArray(position.market) as Address))
+
+        let pricePoint = loadPricePoint(Address.fromByteArray(position.market) as Address, position.pricePoint, true)
+
+        if (pricePoint == null) continue
 
       }
 

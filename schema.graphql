@@ -5,7 +5,7 @@ type Position @entity {
   market: Bytes!
   isLong: Boolean!
   leverage: BigInt!
-  # pricePoint: PricePoint! @derivedFrom(field: "id")
+  pricePoint: PricePoint! 
   oiShares: BigInt!
   debt: BigInt!
   cost: BigInt!
@@ -23,7 +23,6 @@ type Account @entity {
   id: ID!
   address: Bytes!
   balances: [Balance!]! @derivedFrom(field: "account")
-  # positions: [ Position! ]! @derivedFrom(field: "id")
 }
 
 type PricePoint @entity {
@@ -31,7 +30,12 @@ type PricePoint @entity {
   number: BigInt!
   bid: BigInt!
   ask: BigInt!
-  twap: BigInt!
+  index: BigInt!
+}
+
+type PricePointCount @entity {
+  id: ID!
+  count: BigInt!
 }
 
 type Market @entity {

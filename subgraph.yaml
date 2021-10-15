@@ -67,7 +67,7 @@ dataSources:
           handler: handleFundingPaid
         - event: NewPrice(uint256,uint256,uint256)
           handler: handleNewPrice
-      blockHanders:
+      blockHandlers:
         - handler: handleBlock
       file: ./src/OverlayV1UniswapV3Market.ts
 

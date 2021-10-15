@@ -22,6 +22,7 @@ type CollateralManager @entity {
 type Account @entity {
   id: ID!
   address: Bytes!
+  balances: [Balance!]! @derivedFrom(field: "account")
   # positions: [ Position! ]! @derivedFrom(field: "id")
 }
 
@@ -47,7 +48,7 @@ type Market @entity {
 
 type Balance @entity {
   id: ID!
-  position: Position!
+  position: BigInt!
   account: Account!
-  value: BigInt!
+  shares: BigInt!
 }

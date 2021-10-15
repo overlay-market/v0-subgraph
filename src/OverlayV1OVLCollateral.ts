@@ -90,9 +90,9 @@ function getBalance(position: Position, account: Account): Balance {
   let balance = Balance.load(balanceid);
   if (balance == null) {
     balance = new Balance(balanceid);
-    balance.position = position.id;
+    balance.position = position.number;
     balance.account = account.id;
-    balance.value = constants.BIGINT_ZERO;
+    balance.shares = constants.BIGINT_ZERO;
   }
 
   return balance as Balance
@@ -120,7 +120,7 @@ function registerTransfer(
 	} else {
 
 		let balance = getBalance(position, from)
-		balance.value = integers.decrement(balance.value, value)
+		balance.shares = integers.decrement(balance.shares, value)
 		balance.save()
 
 	}
@@ -132,7 +132,7 @@ function registerTransfer(
 	} else {
 
 		let balance = getBalance(position, to)
-		balance.value = integers.increment(balance.value, value)
+		balance.shares = integers.increment(balance.shares, value)
 		balance.save()
 
 	}
@@ -143,6 +143,27 @@ function registerTransfer(
 
 
 export function handleTransferBatch(event: TransferBatch): void { 
+
+  let collateral = getCollateralManager(event.address)
+  let from = getAccount(event.params.from)
+	let to = getAccount(event.params.to)
+
+	let ids = event.params.ids
+	let values = event.params.values
+
+	for (let i = 0;  i < ids.length; ++i) {
+
+    let position = getPosition(collateral, ids[i])
+
+		registerTransfer(
+      collateral,
+      position,
+			from,
+			to,
+			values[i]
+		)
+
+	}
 
 }
 
@@ -160,6 +181,14 @@ export function handleTransferSingle(event: TransferSingle): void {
   log.info("\n\nfrom: {}\n\n", [from.id])
 
   log.info("\n\nto: {}\n\n", [to.id])
+
+  registerTransfer(
+    collateralManager,
+    position,
+    from,
+    to,
+    event.params.value
+  )
 
 }
 

@@ -10,6 +10,7 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 overlay-market/overlay-v1"
   },
   "dependencies": {
+    "@amxx/graphprotocol-utils": "^1.1.0-alpha.0",
     "@graphprotocol/graph-cli": "0.22.3",
     "@graphprotocol/graph-ts": "0.22.1"
   }

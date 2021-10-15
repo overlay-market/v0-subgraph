@@ -1,9 +1,10 @@
-import { Address, ethereum, log } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
 
 import {
   FundingPaid,
   NewPrice,
   OverlayV1UniswapV3Market,
+  OverlayV1UniswapV3Market__oiResult
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import {
@@ -47,7 +48,6 @@ export function handleNewPrice(event: NewPrice): void {
 
 export function handleBlock(block: ethereum.Block): void {
 
-
   let now = block.timestamp
 
   let manifest = loadMarketManifest()
@@ -83,6 +83,13 @@ export function handleBlock(block: ethereum.Block): void {
 
         if (pricePoint == null) continue
 
+        setLiquidationPrice(
+          position, 
+          pricePoint as PricePoint, 
+          oi, 
+          marginMaintenance
+        ) 
+
       }
 
     }
@@ -91,4 +98,64 @@ export function handleBlock(block: ethereum.Block): void {
 
   log.info("\n\nhandling the block number {} time {}\n\n", [block.number.toString(), block.timestamp.toString()])
 
+}
+
+
+function setLiquidationPrice (
+  position: Position, 
+  pricePoint: PricePoint,
+  openInterest: OverlayV1UniswapV3Market__oiResult,
+  marginMaintenance: BigDecimal
+): void {
+
+  let oi = position.isLong
+    ? morphd(openInterest.value0)
+    : morphd(openInterest.value1)
+ 
+  let oiShares = position.isLong
+    ? morphd(openInterest.value2)
+    : morphd(openInterest.value3)
+
+  let liquidationPrice = _liquidationPrice(
+    position, 
+    pricePoint,
+    oi, 
+    oiShares, 
+    marginMaintenance
+  )
+
+  position.liquidationPrice = liquidationPrice
+
+  position.save()
+
+}
+
+function _liquidationPrice (
+  position: Position, 
+  pricePoint: PricePoint,
+  totalOi: BigDecimal, 
+  totalOiShares: BigDecimal,
+  marginMaintenance: BigDecimal
+): BigDecimal {
+
+  let entryPrice = position.isLong
+    ? morphd(pricePoint.ask)
+    : morphd(pricePoint.bid)
+
+  let oiShares = morphd(position.oiShares)
+  let cost = morphd(position.cost)
+  let debt = morphd(position.debt)
+
+  let oi = oiShares * totalOi / totalOiShares;
+  let initialOi = cost + debt;
+
+  let _oiFrame = ( ( initialOi * marginMaintenance ) + debt ) / oi
+
+  let liquidationPrice = BigInt.fromI32(0).toBigDecimal()
+
+  if (position.isLong) liquidationPrice = entryPrice * _oiFrame;
+  else liquidationPrice = entryPrice * ( BigInt.fromI32(2).toBigDecimal() - _oiFrame );
+
+  return liquidationPrice
+            
 }

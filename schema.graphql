@@ -63,3 +63,8 @@ type MarketMonitor @entity {
   id: ID!
   positions: [ Position! ]!
 }
+
+type Count @entity {
+  id: ID!
+  count: BigInt!
+}

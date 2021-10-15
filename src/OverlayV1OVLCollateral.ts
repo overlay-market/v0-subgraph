@@ -174,14 +174,6 @@ export function handleTransferSingle(event: TransferSingle): void {
   let from              = getAccount(event.params.from)
 	let to                = getAccount(event.params.to)
 
-  log.info("\n\ncollateral manager: {}\n\n", [collateralManager.id])
-
-  log.info("\n\nposition: {}\n\n", [position.id])
-
-  log.info("\n\nfrom: {}\n\n", [from.id])
-
-  log.info("\n\nto: {}\n\n", [to.id])
-
   registerTransfer(
     collateralManager,
     position,

@@ -5,9 +5,12 @@ import {
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import {
+    Account,
+    CollateralManager,
     Market,
     MarketManifest,
     MarketMonitor,
+    Position,
     PricePoint,
     PricePointCount
 } from "../generated/schema"
@@ -67,6 +70,42 @@ function monitorMarket (_market: Address): void {
   manifest.compoundings = compoundings
 
   manifest.save()
+
+}
+
+export function loadPosition(collateralManager: CollateralManager, id: BigInt, market: string = Address.zero.toString()): Position {
+
+	let positionId = collateralManager.id.concat('-').concat(id.toString())
+
+	let position = Position.load(positionId)
+
+	if (position == null) {
+
+		position = new Position(positionId)
+		position.collateralManager  = collateralManager.address
+		position.number             = id
+		position.totalSupply        = BigInt.fromI32(0)
+        position.save()
+
+        monitorPosition(market, position)
+
+	}
+
+	return position as Position
+
+}
+
+function monitorPosition(market: string, position: Position): void {
+
+  let monitor = MarketMonitor.load(market) as MarketMonitor
+
+  let positions = monitor.positions
+
+  positions.push(position.id)
+
+  monitor.positions = positions
+
+  monitor.save()
 
 }
 
@@ -142,3 +181,47 @@ export function morphd (val: BigInt): BigDecimal {
 }
 
 
+export function loadAccount(address: Address): Account {
+
+  let accountId = address.toHex()
+  
+  let account = Account.load(accountId)
+
+  if (account == null) {
+    
+    account = new Account(accountId)
+    account.address = address
+    account.save()
+
+  }
+
+  return account
+
+}
+
+
+export function loadCollateralManager(address: Address): CollateralManager {
+
+  let collateralId = address.toHex()
+
+  let collateralManager = CollateralManager.load(collateralId)
+
+  if (collateralManager == null) {
+
+    collateralManager = new CollateralManager(collateralId)
+    collateralManager.address = address
+    collateralManager.save()
+
+  }
+
+  return collateralManager
+
+}
+
+export function increment(num: BigInt, amount: BigInt = constants.BIGINT_ONE): BigInt {
+    return num.plus(amount)
+}
+
+export function decrement(num: BigInt, amount: BigInt = constants.BIGINT_ONE): BigInt {
+    return num.minus(amount)
+}

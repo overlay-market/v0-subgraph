@@ -25,83 +25,13 @@ import {
 } from "../generated/schema"
 
 import {
-  constants,
-  events,
-  integers,
-  transactions,
-} from '@amxx/graphprotocol-utils';
+  decrement,
+  increment,
+  loadAccount,
+  loadCollateralManager,
+  loadPosition
+} from "./utils"
 
-function monitorPosition(market: string, position: Position): void {
-
-  let monitor = MarketMonitor.load(market) as MarketMonitor
-
-  let positions = monitor.positions
-
-  positions.push(position.id)
-
-  monitor.positions = positions
-
-  monitor.save()
-
-}
-
-function getCollateralManager(address: Address): CollateralManager {
-
-  let collateralId = address.toHex()
-
-  let collateralManager = CollateralManager.load(collateralId)
-
-  if (collateralManager == null) {
-
-    collateralManager = new CollateralManager(collateralId)
-    collateralManager.address = address
-    collateralManager.save()
-
-  }
-
-  return collateralManager
-
-}
-
-function getAccount(address: Address): Account {
-
-  let accountId = address.toHex()
-  
-  let account = Account.load(accountId)
-
-  if (account == null) {
-    
-    account = new Account(accountId)
-    account.address = address
-    account.save()
-
-  }
-
-  return account
-
-}
-
-function getPosition(collateralManager: CollateralManager, id: BigInt, market: string = constants.ADDRESS_ZERO): Position {
-
-	let positionId = collateralManager.id.concat('-').concat(id.toString())
-
-	let position = Position.load(positionId)
-
-	if (position == null) {
-
-		position = new Position(positionId)
-		position.collateralManager  = collateralManager.address
-		position.number             = id
-		position.totalSupply        = constants.BIGINT_ZERO
-    position.save()
-
-    monitorPosition(market, position)
-
-	}
-
-	return position as Position
-
-}
 
 function getBalance(position: Position, account: Account): Balance {
 
@@ -111,7 +41,7 @@ function getBalance(position: Position, account: Account): Balance {
     balance = new Balance(balanceid);
     balance.position = position.number;
     balance.account = account.id;
-    balance.shares = constants.BIGINT_ZERO;
+    balance.shares = BigInt.fromI32(0)
   }
 
   return balance as Balance
@@ -122,8 +52,8 @@ export function handleApprovalForAll(event: ApprovalForAll): void { }
 
 export function handleBuild(event: Build): void { 
 
-  let collateralManager = getCollateralManager(event.address)
-  let position = getPosition(collateralManager, event.params.positionId, event.params.market.toHexString())
+  let collateralManager = loadCollateralManager(event.address)
+  let position = loadPosition(collateralManager, event.params.positionId, event.params.market.toHexString())
 
 }
 
@@ -137,26 +67,26 @@ function registerTransfer(
 	value:        BigInt
 ) : void {
 
-	if (from.id == constants.ADDRESS_ZERO) {
+	if (from.id == Address.zero.toString()) {
 
-		position.totalSupply = integers.increment(position.totalSupply, value)
+		position.totalSupply = increment(position.totalSupply, value)
 
 	} else {
 
 		let balance = getBalance(position, from)
-		balance.shares = integers.decrement(balance.shares, value)
+		balance.shares = decrement(balance.shares, value)
 		balance.save()
 
 	}
 
-	if (to.id == constants.ADDRESS_ZERO) {
+	if (to.id == Address.zero.toString()) {
 
-		position.totalSupply = integers.decrement(position.totalSupply, value)
+		position.totalSupply = decrement(position.totalSupply, value)
 
 	} else {
 
 		let balance = getBalance(position, to)
-		balance.shares = integers.increment(balance.shares, value)
+		balance.shares = increment(balance.shares, value)
 		balance.save()
 
 	}
@@ -168,16 +98,16 @@ function registerTransfer(
 
 export function handleTransferBatch(event: TransferBatch): void { 
 
-  let collateral = getCollateralManager(event.address)
-  let from = getAccount(event.params.from)
-	let to = getAccount(event.params.to)
+  let collateral = loadCollateralManager(event.address)
+  let from = loadAccount(event.params.from)
+	let to = loadAccount(event.params.to)
 
 	let ids = event.params.ids
 	let values = event.params.values
 
 	for (let i = 0;  i < ids.length; ++i) {
 
-    let position = getPosition(collateral, ids[i])
+    let position = loadPosition(collateral, ids[i])
 
 		registerTransfer(
       collateral,
@@ -193,10 +123,10 @@ export function handleTransferBatch(event: TransferBatch): void {
 
 export function handleTransferSingle(event: TransferSingle): void {
 
-  let collateralManager = getCollateralManager(event.address)
-  let position = getPosition(collateralManager, event.params.id)
-  let from = getAccount(event.params.from)
-	let to = getAccount(event.params.to)
+  let collateralManager = loadCollateralManager(event.address)
+  let position = loadPosition(collateralManager, event.params.id)
+  let from = loadAccount(event.params.from)
+	let to = loadAccount(event.params.to)
 
   registerTransfer(
     collateralManager,

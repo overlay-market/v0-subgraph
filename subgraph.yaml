@@ -21,15 +21,13 @@ dataSources:
         - URI
         - Unwind
         - Update
-        - log
-        - log_addr
       abis:
         - name: OverlayV1OVLCollateral
           file: ./abis/OverlayV1OVLCollateral.json
       eventHandlers:
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Build(uint256,uint256,uint256)
+        - event: Build(address,uint256,uint256,uint256)
           handler: handleBuild
         - event: Liquidate(uint256,uint256,uint256,address)
           handler: handleLiquidate
@@ -39,7 +37,7 @@ dataSources:
           handler: handleTransferSingle
         - event: URI(string,indexed uint256)
           handler: handleURI
-        - event: Unwind(uint256,uint256,uint256)
+        - event: Unwind(address,uint256,uint256,uint256)
           handler: handleUnwind
         - event: Update(uint256,uint256,uint256,uint256)
           handler: handleUpdate
@@ -58,7 +56,6 @@ dataSources:
       entities:
         - FundingPaid
         - NewPrice
-        - log
       abis:
         - name: OverlayV1UniswapV3Market
           file: ./abis/OverlayV1UniswapV3Market.json

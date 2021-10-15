@@ -55,6 +55,21 @@ export function handleBuild(event: Build): void {
   let collateralManager = loadCollateralManager(event.address)
   let position = loadPosition(collateralManager, event.params.positionId, event.params.market.toHexString())
 
+  let collateralManagerContract = OverlayV1OVLCollateral.bind(event.address)
+
+  let positionStruct = collateralManagerContract.positions(event.params.positionId)
+
+  position.isLong = positionStruct.value1
+  position.leverage = positionStruct.value2
+  position.pricePoint = event.params.market.toHexString().concat('-')
+              .concat(positionStruct.value3.toString())
+  position.oiShares = positionStruct.value4
+  position.debt = positionStruct.value5
+  position.cost = positionStruct.value6
+  position.compounding = positionStruct.value7
+
+  position.save()
+
 }
 
 export function handleLiquidate(event: Liquidate): void {}

@@ -52,3 +52,14 @@ type Balance @entity {
   account: Account!
   shares: BigInt!
 }
+
+type MarketManifest @entity {
+  id: ID!
+  markets: [ Bytes! ]!
+  compoundings: [ BigInt! ]!
+}
+
+type MarketMonitor @entity {
+  id: ID!
+  positions: [ Position! ]!
+}

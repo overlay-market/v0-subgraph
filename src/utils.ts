@@ -169,7 +169,6 @@ export function loadPricePoint (
 
 }
 
-
 const decimals = BigInt.fromI32(10**18).toBigDecimal()
 
 export function morphd (val: BigInt): BigDecimal {
@@ -179,7 +178,6 @@ export function morphd (val: BigInt): BigDecimal {
     return decimal / decimals
   
 }
-
 
 export function loadAccount(address: Address): Account {
 
@@ -199,7 +197,6 @@ export function loadAccount(address: Address): Account {
 
 }
 
-
 export function loadCollateralManager(address: Address): CollateralManager {
 
   let collateralId = address.toHex()
@@ -218,10 +215,10 @@ export function loadCollateralManager(address: Address): CollateralManager {
 
 }
 
-export function increment(num: BigInt, amount: BigInt = constants.BIGINT_ONE): BigInt {
+export function increment(num: BigInt, amount: BigInt = BigInt.fromI32(1)): BigInt {
     return num.plus(amount)
 }
 
-export function decrement(num: BigInt, amount: BigInt = constants.BIGINT_ONE): BigInt {
+export function decrement(num: BigInt, amount: BigInt = BigInt.fromI32(1)): BigInt {
     return num.minus(amount)
 }

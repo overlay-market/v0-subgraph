@@ -65,6 +65,6 @@ export function handleNewPrice(event: NewPrice): void {
 
 export function handleBlock(block: ethereum.Block): void {
 
-  log.info("\n\nhandline the block\n\n", [])
+  log.info("\n\nhandling the block number {} time {}\n\n", [block.number.toString(), block.timestamp.toString()])
 
 }

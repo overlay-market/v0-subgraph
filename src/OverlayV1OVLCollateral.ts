@@ -19,7 +19,9 @@ import {
 import { 
   Account,
   Balance,
+  Count,
   CollateralManager,
+  MarketMonitor,
   Position
 } from "../generated/schema"
 
@@ -29,6 +31,32 @@ import {
   integers,
   transactions,
 } from '@amxx/graphprotocol-utils';
+
+function count (): string {
+
+  let count = Count.load('1')
+  if (count == null) count = new Count('1')
+  let the_count = count.count
+  the_count = the_count.plus(BigInt.fromI32(1))
+  count.count = the_count
+  count.save()
+  return count.count.toString()
+
+}
+
+function monitorPosition(market: string, position: Position): void {
+
+  let monitor = MarketMonitor.load(market) as MarketMonitor
+
+  let positions = monitor.positions
+
+  positions.push(position.id)
+
+  monitor.positions = positions
+
+  monitor.save()
+
+}
 
 function getCollateralManager(address: Address): CollateralManager {
 
@@ -66,18 +94,22 @@ function getAccount(address: Address): Account {
 
 }
 
-function getPosition(collateralManager: CollateralManager, id: BigInt): Position {
+function getPosition(collateralManager: CollateralManager, id: BigInt, market: string = constants.ADDRESS_ZERO): Position {
 
 	let positionId = collateralManager.id.concat('-').concat(id.toString())
 
 	let position = Position.load(positionId)
 
 	if (position == null) {
+
 		position = new Position(positionId)
 		position.collateralManager  = collateralManager.address
 		position.number             = id
 		position.totalSupply        = constants.BIGINT_ZERO
     position.save()
+
+    monitorPosition(market, position)
+
 	}
 
 	return position as Position
@@ -101,7 +133,12 @@ function getBalance(position: Position, account: Account): Balance {
 
 export function handleApprovalForAll(event: ApprovalForAll): void { }
 
-export function handleBuild(event: Build): void { }
+export function handleBuild(event: Build): void { 
+
+  let collateralManager = getCollateralManager(event.address)
+  let position = getPosition(collateralManager, event.params.positionId, event.params.market.toHexString())
+
+}
 
 export function handleLiquidate(event: Liquidate): void {}
 
@@ -170,9 +207,9 @@ export function handleTransferBatch(event: TransferBatch): void {
 export function handleTransferSingle(event: TransferSingle): void {
 
   let collateralManager = getCollateralManager(event.address)
-  let position          = getPosition(collateralManager, event.params.id)
-  let from              = getAccount(event.params.from)
-	let to                = getAccount(event.params.to)
+  let position = getPosition(collateralManager, event.params.id)
+  let from = getAccount(event.params.from)
+	let to = getAccount(event.params.to)
 
   registerTransfer(
     collateralManager,

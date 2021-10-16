@@ -11,15 +11,20 @@ import {
     BalanceOVL
 } from "../generated/schema"
 import {
+    decrement,
+    increment,
     loadBalanceOVL
 } from "./utils"
 
 export function handleTransfer(event: Transfer): void {
 
     let from = loadBalanceOVL(event.params.from)
+    from.balance = decrement(from.balance, event.params.value)
+    from.save()
 
     let to = loadBalanceOVL(event.params.to)
-
+    to.balance = increment(to.balance, event.params.value)
+    to.save()
 
 }
 

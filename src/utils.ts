@@ -119,11 +119,14 @@ export function loadBalance(position: Position, account: Account): Balance {
 
   let balanceid = position.id.concat('-').concat(account.id);
   let balance = Balance.load(balanceid);
+
   if (balance == null) {
+
     balance = new Balance(balanceid);
     balance.position = position.number;
     balance.account = account.id;
     balance.shares = BigInt.fromI32(0)
+
   }
 
   return balance as Balance

@@ -7,6 +7,7 @@ import {
 import {
     Account,
     Balance,
+    BalanceOVL,
     CollateralManager,
     Market,
     MarketManifest,
@@ -126,6 +127,23 @@ export function loadBalance(position: Position, account: Account): Balance {
   }
 
   return balance as Balance
+
+}
+
+export function loadBalanceOVL(account: Address): BalanceOVL {
+
+  let balance = BalanceOVL.load(account.toHexString());
+
+  if (balance == null) {
+
+    balance = new BalanceOVL(account.toHexString());
+    balance.account = account.toHexString();
+    balance.balance = BigInt.fromI32(0)
+    balance.locked = BigInt.fromI32(0)
+
+  }
+
+  return balance as BalanceOVL
 
 }
 

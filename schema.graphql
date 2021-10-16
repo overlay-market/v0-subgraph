@@ -23,6 +23,7 @@ type Account @entity {
   id: ID!
   address: Bytes!
   balances: [Balance!]! @derivedFrom(field: "account")
+  balanceOVL: BalanceOVL! @derivedFrom(field: "account")
 }
 
 type PricePoint @entity {
@@ -52,9 +53,16 @@ type Market @entity {
 
 type Balance @entity {
   id: ID!
-  position: BigInt!
   account: Account!
+  position: BigInt!
   shares: BigInt!
+}
+
+type BalanceOVL @entity {
+  id: ID!
+  account: Account!
+  balance: BigInt!
+  locked: BigInt!
 }
 
 type MarketManifest @entity {

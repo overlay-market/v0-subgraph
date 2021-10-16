@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts"
 
 import {
   FundingPaid,
@@ -55,47 +55,51 @@ export function handleBlock(block: ethereum.Block): void {
 
   let markets = manifest.markets
 
-  for (let i = 0; i < compoundings.length; i++) {
+  for (let i = 0; i < markets.length; i++) {
 
-    let compounding = compoundings[i]
     let marketAddr = markets[i]
 
-    if (compounding.le(now)) {
+    let oi = OverlayV1UniswapV3Market.bind(Address.fromByteArray(marketAddr) as Address).oi()
 
-      let market = loadMarket(Address.fromByteArray(marketAddr) as Address)
+    if (compoundings[i] < now) {
 
-      let oi = OverlayV1UniswapV3Market.bind(Address.fromByteArray(marketAddr) as Address).oi()
-
-      let monitor = loadMarketMonitor(Address.fromByteArray(marketAddr) as Address)
-
-      let positions = monitor.positions
-
-      for (let j = 0; j < positions.length; j++) {
-
-        let position = Position.load(positions[j]) as Position
-
-        let collateralManager = OverlayV1OVLCollateral.bind(Address.fromByteArray(position.collateralManager) as Address)
-
-        let marginMaintenance = morphd(collateralManager.marginMaintenance(Address.fromByteArray(position.market) as Address))
-
-        let pricePoint = loadPricePoint(Address.fromByteArray(position.market) as Address, position.pricePoint, true)
-
-        if (pricePoint == null) continue
-
-        setLiquidationPrice(
-          position, 
-          pricePoint as PricePoint, 
-          oi, 
-          marginMaintenance
-        ) 
-
-      }
+      remasterLiquidations(marketAddr, oi)
 
     }
 
   }
 
-  log.info("\n\nhandling the block number {} time {}\n\n", [block.number.toString(), block.timestamp.toString()])
+}
+
+function remasterLiquidations (
+  market: Bytes,
+  oi: OverlayV1UniswapV3Market__oiResult
+): void {
+
+  let monitor = loadMarketMonitor(Address.fromByteArray(market) as Address)
+
+  let positions = monitor.positions
+
+  for (let j = 0; j < positions.length; j++) {
+
+    let position = Position.load(positions[j]) as Position
+
+    let collateralManager = OverlayV1OVLCollateral.bind(Address.fromByteArray(position.collateralManager) as Address)
+
+    let marginMaintenance = morphd(collateralManager.marginMaintenance(Address.fromByteArray(position.market) as Address))
+
+    let pricePoint = loadPricePoint(Address.fromByteArray(position.market) as Address, position.pricePoint, true)
+
+    if (pricePoint == null) continue
+
+    setLiquidationPrice(
+      position, 
+      pricePoint as PricePoint, 
+      oi, 
+      marginMaintenance
+    ) 
+
+  }
 
 }
 

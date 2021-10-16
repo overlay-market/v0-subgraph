@@ -49,6 +49,13 @@ type Market @entity {
   baseSymbol: String!
   quoteSymbol: String!
   # prices: [ PricePoint! ]! @derivedFrom(field: "id")
+  oiLong: BigInt!
+  oiLongShares: BigInt!
+  oiLongQueued: BigInt!
+  oiShort: BigInt!
+  oiShortShares: BigInt!
+  oiShortQueued: BigInt!
+  oiCap: BigInt!
 }
 
 type Balance @entity {

@@ -59,7 +59,24 @@ export function handleBlock(block: ethereum.Block): void {
 
     let marketAddr = markets[i]
 
-    let oi = OverlayV1UniswapV3Market.bind(Address.fromByteArray(marketAddr) as Address).oi()
+    let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromByteArray(marketAddr) as Address)
+
+    let oi = marketInstance.oi()
+    let oiCap = marketInstance.oiCap()
+
+    let market = loadMarket(Address.fromByteArray(marketAddr) as Address)
+
+    market.oiLong = oi.value0
+    market.oiLongShares = oi.value2
+    market.oiLongShares = oi.value4
+
+    market.oiShort = oi.value1
+    market.oiShortShares = oi.value3
+    market.oiShortQueued = oi.value5
+
+    market.oiCap = oiCap
+
+    market.save()
 
     if (compoundings[i] < now) {
 

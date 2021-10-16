@@ -28,25 +28,11 @@ import {
   decrement,
   increment,
   loadAccount,
+  loadBalance,
   loadCollateralManager,
   loadPosition
 } from "./utils"
 
-
-function getBalance(position: Position, account: Account): Balance {
-
-  let balanceid = position.id.concat('-').concat(account.id);
-  let balance = Balance.load(balanceid);
-  if (balance == null) {
-    balance = new Balance(balanceid);
-    balance.position = position.number;
-    balance.account = account.id;
-    balance.shares = BigInt.fromI32(0)
-  }
-
-  return balance as Balance
-
-}
 
 export function handleApprovalForAll(event: ApprovalForAll): void { }
 
@@ -88,7 +74,7 @@ function registerTransfer(
 
 	} else {
 
-		let balance = getBalance(position, from)
+		let balance = loadBalance(position, from)
 		balance.shares = decrement(balance.shares, value)
 		balance.save()
 
@@ -100,7 +86,7 @@ function registerTransfer(
 
 	} else {
 
-		let balance = getBalance(position, to)
+		let balance = loadBalance(position, to)
 		balance.shares = increment(balance.shares, value)
 		balance.save()
 

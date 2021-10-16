@@ -257,7 +257,7 @@ export function loadCollateralManager(address: Address): CollateralManager {
 }
 
 export function isCollateral (address: string): boolean {
-    let collateral = CollateralManager.load(address.toHexString())
+    let collateral = CollateralManager.load(address)
     return collateral != null
 }
 

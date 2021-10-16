@@ -73,7 +73,11 @@ function monitorMarket (_market: Address): void {
 
 }
 
-export function loadPosition(collateralManager: CollateralManager, id: BigInt, market: string = Address.zero.toString()): Position {
+export function loadPosition(
+    collateralManager: CollateralManager, 
+    id: BigInt, 
+    market: string = Address.zero.toString()
+): Position {
 
 	let positionId = collateralManager.id.concat('-').concat(id.toString())
 

@@ -155,7 +155,23 @@ export function handleTransferSingle(event: TransferSingle): void {
 
 export function handleURI(event: URI): void {}
 
-export function handleUnwind(event: Unwind): void {}
+export function handleUnwind(event: Unwind): void {
+
+  let collateral = loadCollateralManager(event.address)
+
+  let position = loadPosition(collateral, event.params.positionId)
+
+  let collateralInstance = OverlayV1OVLCollateral.bind(event.address)
+
+  let positionStruct = collateralInstance.positions(event.params.positionId)
+
+  position.oiShares = positionStruct.value4
+  position.debt = positionStruct.value5
+  position.cost = positionStruct.value6
+
+  position.save()
+
+}
 
 export function handleUpdate(event: Update): void {}
 

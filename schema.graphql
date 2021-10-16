@@ -56,6 +56,11 @@ type Market @entity {
   oiShortShares: BigInt!
   oiShortQueued: BigInt!
   oiCap: BigInt!
+  updatePeriod: BigInt!
+  compoundingPeriod: BigInt!
+  positions: [ Position! ]! @derivedFrom(field: "market")
+  prices: [ PricePoint! ]! @derivedFrom(field: "market")
+  currentPrice: PricePoint!
 }
 
 type Balance @entity {
@@ -76,6 +81,7 @@ type MarketManifest @entity {
   id: ID!
   markets: [ Bytes! ]!
   compoundings: [ BigInt! ]!
+  updates: [ BigInt! ]!
 }
 
 type MarketMonitor @entity {

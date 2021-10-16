@@ -65,8 +65,12 @@ function monitorMarket (_market: Address): void {
   let compounded = market.compounded()
   let compoundPeriod = market.compoundingPeriod()
 
+  let updated = market.updated()
+  let updatePeriod = market.updatePeriod()
+
   markets.push(market._address)
   compoundings.push(compounded.plus(compoundPeriod))
+  updates.push(update.plus(updatePeriod))
 
   manifest.markets = markets
   manifest.compoundings = compoundings
@@ -170,7 +174,7 @@ export function countPricePoint (market: Address): string {
 export function loadPricePoint (
     _market: Address, 
     _pricePoint: string, 
-    _forLiquidationPrice: boolean
+    _type: string
 ): PricePoint|null {
 
     let pricePointId = _market.toHexString().concat('-').concat(_pricePoint)
@@ -179,7 +183,12 @@ export function loadPricePoint (
 
     if (pricePoint == null) {
 
-        if (_forLiquidationPrice) {
+        if (_type == "event") {
+
+            pricePoint = new PricePoint(pricePointId)
+            pricePoint.number = BigInt.fromString(_pricePoint)
+
+        } else ("current" == _type || _type == "liquidation") {
 
             let market = OverlayV1UniswapV3Market.bind(_market)
 
@@ -192,15 +201,12 @@ export function loadPricePoint (
                 pricePoint.ask = tryPricePoint.value.ask
                 pricePoint.index = tryPricePoint.value.index
                 pricePoint.number = BigInt.fromString(_pricePoint)
+                pricePoint.market = _market.toHexString()
                 pricePoint.save()
-                countPricePoint(_market)
 
             }
 
-        } else {
-
-            pricePoint = new PricePoint(pricePointId)
-            pricePoint.number = BigInt.fromString(_pricePoint)
+            if (_type == "liquidation") countPricePoint(_market)
 
         }
 

@@ -21,6 +21,7 @@ import {
 } from "./utils"
 
 import {
+  Market,
   Position,
   PricePoint
 } from "../generated/schema"
@@ -31,11 +32,7 @@ export function handleNewPrice(event: NewPrice): void {
 
   let number = countPricePoint(event.address)
 
-  let pricePoint = loadPricePoint(
-    event.address, 
-    number,
-    false
-  ) as PricePoint
+  let pricePoint = loadPricePoint( event.address, number, "event") as PricePoint
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
@@ -51,20 +48,22 @@ export function handleBlock(block: ethereum.Block): void {
 
   let manifest = loadMarketManifest()
 
+  let markets = manifest.markets 
   let compoundings = manifest.compoundings
+  let updates = manifest.updates
 
-  let markets = manifest.markets
+  for (let i = 0; i < manifest.markets.length; i++) {
 
-  for (let i = 0; i < markets.length; i++) {
+    let marketAddr = Address.fromByteArray(markets[i]) as Address
+    let compounding = compoundings[i]
+    let update = updates[i]
 
-    let marketAddr = markets[i]
-
-    let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromByteArray(marketAddr) as Address)
+    let marketInstance = OverlayV1UniswapV3Market.bind(marketAddr)
 
     let oi = marketInstance.oi()
     let oiCap = marketInstance.oiCap()
 
-    let market = loadMarket(Address.fromByteArray(marketAddr) as Address)
+    let market = loadMarket(marketAddr)
 
     market.oiLong = oi.value0
     market.oiLongShares = oi.value2
@@ -76,24 +75,43 @@ export function handleBlock(block: ethereum.Block): void {
 
     market.oiCap = oiCap
 
-    market.save()
 
-    if (compoundings[i] < now) {
+    if (update < now ) {
 
-      remasterLiquidations(marketAddr, oi)
+      let pricePoint = loadPricePoint( marketAddr, "none", "current" )
+
+      market.currentPrice = pricePoint.id
+
+      updates[i] = update.plus(market.updatePeriod)
 
     }
 
+    if (now > compounding) {
+
+      remasterLiquidations(market, oi)
+
+      compoundings[i] = compounding.plus(market.compoundingPeriod)
+
+    }
+
+    market.save()
+
   }
+
+  manifest.compoundings = compoundings
+  manifest.updates = updates
+  manifest.save()
 
 }
 
 function remasterLiquidations (
-  market: Bytes,
+  market: Market,
   oi: OverlayV1UniswapV3Market__oiResult
 ): void {
 
-  let monitor = loadMarketMonitor(Address.fromByteArray(market) as Address)
+  let marketAddr = Address.fromHexString(market.id) as Address
+
+  let monitor = loadMarketMonitor(marketAddr)
 
   let positions = monitor.positions
 
@@ -103,9 +121,9 @@ function remasterLiquidations (
 
     let collateralManager = OverlayV1OVLCollateral.bind(Address.fromByteArray(position.collateralManager) as Address)
 
-    let marginMaintenance = morphd(collateralManager.marginMaintenance(Address.fromByteArray(position.market) as Address))
+    let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 
-    let pricePoint = loadPricePoint(Address.fromByteArray(position.market) as Address, position.pricePoint, true)
+    let pricePoint = loadPricePoint( marketAddr, position.pricePoint, "liquidation" )
 
     if (pricePoint == null) continue
 

@@ -13,17 +13,23 @@ import {
 import {
     decrement,
     increment,
+    isCollateral,
     loadBalanceOVL
 } from "./utils"
 
 export function handleTransfer(event: Transfer): void {
 
     let from = loadBalanceOVL(event.params.from)
-    from.balance = decrement(from.balance, event.params.value)
-    from.save()
-
     let to = loadBalanceOVL(event.params.to)
+    let v = event.params.value
+
+    from.balance = decrement(from.balance, event.params.value)
     to.balance = increment(to.balance, event.params.value)
+
+    if (isCollateral(to.account)) from.locked = increment(from.locked, v)
+    if (isCollateral(from.account)) to.locked = decrement(to.locked, v)
+
+    from.save()
     to.save()
 
 }

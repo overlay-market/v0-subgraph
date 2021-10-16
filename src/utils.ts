@@ -240,7 +240,7 @@ export function loadAccount(address: Address): Account {
 
 export function loadCollateralManager(address: Address): CollateralManager {
 
-  let collateralId = address.toHex()
+  let collateralId = address.toHexString()
 
   let collateralManager = CollateralManager.load(collateralId)
 
@@ -254,6 +254,11 @@ export function loadCollateralManager(address: Address): CollateralManager {
 
   return collateralManager
 
+}
+
+export function isCollateral (address: string): boolean {
+    let collateral = CollateralManager.load(address.toHexString())
+    return collateral != null
 }
 
 export function increment(num: BigInt, amount: BigInt = BigInt.fromI32(1)): BigInt {

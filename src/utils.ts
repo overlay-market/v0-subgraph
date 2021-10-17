@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts"
 
 import {
   OverlayV1UniswapV3Market,
@@ -16,6 +16,10 @@ import {
     PricePoint,
     PricePointCount
 } from "../generated/schema"
+
+import {
+    ZERO_ADDR
+} from "./constants"
 
 export function loadMarketManifest(): MarketManifest {
 
@@ -69,6 +73,12 @@ function monitorMarket (_market: Address): void {
   let updated = market.updated()
   let updatePeriod = market.updatePeriod()
 
+  log.info("\n\nmarket: {}\ncompoundPeriod: {}\nupdatePeriod: {}", [
+      _market.toHexString(),
+      compoundPeriod.toString(),
+      updatePeriod.toString()
+  ])
+
   markets.push(market._address)
   compoundings.push(compounded.plus(compoundPeriod))
   updates.push(updated.plus(updatePeriod))
@@ -83,7 +93,7 @@ function monitorMarket (_market: Address): void {
 export function loadPosition(
     collateralManager: CollateralManager, 
     id: BigInt, 
-    market: string = Address.zero.toString()
+    market: string = ZERO_ADDR
 ): Position {
 
 	let positionId = collateralManager.id.concat('-').concat(id.toString())
@@ -110,15 +120,15 @@ export function loadPosition(
 
 function monitorPosition(market: string, position: Position): void {
 
-  let monitor = MarketMonitor.load(market) as MarketMonitor
+    let monitor = MarketMonitor.load(market) as MarketMonitor
 
-  let positions = monitor.positions
+    let positions = monitor.positions
 
-  positions.push(position.id)
+    positions.push(position.id)
 
-  monitor.positions = positions
+    monitor.positions = positions
 
-  monitor.save()
+    monitor.save()
 
 }
 

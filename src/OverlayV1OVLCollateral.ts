@@ -33,6 +33,10 @@ import {
   loadPosition
 } from "./utils"
 
+import {
+  ZERO_ADDR
+} from "./constants"
+
 
 export function handleApprovalForAll(event: ApprovalForAll): void { }
 
@@ -68,7 +72,7 @@ function registerTransfer(
 	value:        BigInt
 ) : void {
 
-	if (from.id == Address.zero.toString()) {
+	if (from.id == ZERO_ADDR) {
 
 		position.totalSupply = increment(position.totalSupply, value)
 
@@ -80,7 +84,7 @@ function registerTransfer(
 
 	}
 
-	if (to.id == Address.zero.toString()) {
+	if (to.id == ZERO_ADDR) {
 
 		position.totalSupply = decrement(position.totalSupply, value)
 

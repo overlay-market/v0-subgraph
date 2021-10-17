@@ -93,9 +93,11 @@ export function loadPosition(
 	if (position == null) {
 
 		position = new Position(positionId)
-		position.collateralManager  = collateralManager.address
-		position.number             = id
-		position.totalSupply        = BigInt.fromI32(0)
+
+		position.collateralManager = collateralManager.address.toHexString()
+		position.number = id
+		position.totalSupply = BigInt.fromI32(0)
+
         position.save()
 
         monitorPosition(market, position)

@@ -78,7 +78,7 @@ export function handleBlock(block: ethereum.Block): void {
 
     if (update < now ) {
 
-      let pricePoint = loadPricePoint( marketAddr, "none", "current" )
+      let pricePoint = loadPricePoint( marketAddr, "none", "current" ) as PricePoint
 
       market.currentPrice = pricePoint.id
 
@@ -119,7 +119,7 @@ function remasterLiquidations (
 
     let position = Position.load(positions[j]) as Position
 
-    let collateralManager = OverlayV1OVLCollateral.bind(Address.fromByteArray(position.collateralManager) as Address)
+    let collateralManager = OverlayV1OVLCollateral.bind(Address.fromHexString(position.collateralManager) as Address)
 
     let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 

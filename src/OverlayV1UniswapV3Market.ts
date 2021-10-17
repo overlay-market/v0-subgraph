@@ -60,7 +60,7 @@ export function handleBlock(block: ethereum.Block): void {
     let compounding = compoundings[i]
     let update = updates[i]
 
-    let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromHexString(marketAddr) as Address)
+    let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromString(marketAddr))
 
     let oi = marketInstance.oi()
     let oiCap = marketInstance.oiCap()
@@ -111,7 +111,7 @@ function remasterLiquidations (
   oi: OverlayV1UniswapV3Market__oiResult
 ): void {
 
-  let marketAddr = Address.fromHexString(market.id) as Address
+  let marketAddr = Address.fromString(market.id) 
 
   let monitor = loadMarketMonitor(marketAddr)
 

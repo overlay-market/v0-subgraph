@@ -59,7 +59,7 @@ export function loadMarket (address: string): Market {
 
 function monitorMarket (_market: string): void {
 
-  let marketAddr = Address.fromHexString(_market) as Address
+  let marketAddr = Address.fromString(_market)
 
   let market = OverlayV1UniswapV3Market.bind(marketAddr)
 
@@ -200,7 +200,7 @@ export function loadPricePoint (
 
         } else ("current" == _type || _type == "liquidation") {
 
-            let market = OverlayV1UniswapV3Market.bind(Address.fromHexString(_market) as Address)
+            let market = OverlayV1UniswapV3Market.bind(Address.fromString(_market))
 
             let tryPricePoint = market.try_pricePoints(BigInt.fromString(_pricePoint))
 

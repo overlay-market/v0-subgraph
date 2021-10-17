@@ -37,7 +37,7 @@ export function loadMarketMonitor (market: Address): MarketMonitor {
   
 }
 
-export function loadMarket (address: string): Market {
+export function loadMarket (address: string, block: BigInt = BigInt.fromI32(0)): Market {
 
   let market = Market.load(address)
 
@@ -46,6 +46,7 @@ export function loadMarket (address: string): Market {
     monitorMarket(address)
 
     market = new Market(address)
+    market.created = block
     market.save()
 
     let monitor = new MarketMonitor(address)

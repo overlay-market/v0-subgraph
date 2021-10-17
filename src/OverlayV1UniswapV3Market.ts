@@ -30,7 +30,7 @@ export function handleFundingPaid(event: FundingPaid): void { }
 
 export function handleNewPrice(event: NewPrice): void {
 
-  loadMarket(event.address.toHexString())
+  loadMarket(event.address.toHexString(), event.block.number)
 
   let number = countPricePoint(event.address.toHexString())
 
@@ -62,10 +62,13 @@ export function handleBlock(block: ethereum.Block): void {
 
     let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromString(marketAddr))
 
-    let oi = marketInstance.oi()
+    let market = loadMarket(marketAddr)
+
+    if (market.created == block.number) continue
+
     let oiCap = marketInstance.oiCap()
 
-    let market = loadMarket(marketAddr)
+    let oi = marketInstance.oi()
 
     market.oiLong = oi.value0
     market.oiLongShares = oi.value2
@@ -121,7 +124,7 @@ function remasterLiquidations (
 
     let position = Position.load(positions[j]) as Position
 
-    let collateralManager = OverlayV1OVLCollateral.bind(Address.fromHexString(position.collateralManager) as Address)
+    let collateralManager = OverlayV1OVLCollateral.bind(Address.fromString(position.collateralManager))
 
     let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 

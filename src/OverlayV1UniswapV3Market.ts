@@ -30,6 +30,8 @@ export function handleFundingPaid(event: FundingPaid): void { }
 
 export function handleNewPrice(event: NewPrice): void {
 
+  loadMarket(event.address)
+
   let number = countPricePoint(event.address)
 
   let pricePoint = loadPricePoint( event.address, number, "event") as PricePoint

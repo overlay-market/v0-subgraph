@@ -81,6 +81,7 @@ function monitorMarket (_market: string): void {
 
   manifest.markets = markets
   manifest.compoundings = compoundings
+  manifest.updates = updates
 
   manifest.save()
 

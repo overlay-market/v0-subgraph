@@ -37,18 +37,18 @@ export function loadMarketMonitor (market: Address): MarketMonitor {
   
 }
 
-export function loadMarket (address: Address): Market {
+export function loadMarket (address: string): Market {
 
-  let market = Market.load(address.toHexString())
+  let market = Market.load(address)
 
   if (market == null) {
 
     monitorMarket(address)
 
-    market = new Market(address.toHexString())
+    market = new Market(address)
     market.save()
 
-    let monitor = new MarketMonitor(address.toHexString())
+    let monitor = new MarketMonitor(address)
     monitor.save()
 
   }
@@ -57,9 +57,11 @@ export function loadMarket (address: Address): Market {
 
 }
 
-function monitorMarket (_market: Address): void {
+function monitorMarket (_market: string): void {
 
-  let market = OverlayV1UniswapV3Market.bind(_market)
+  let marketAddr = Address.fromHexString(_market) as Address
+
+  let market = OverlayV1UniswapV3Market.bind(marketAddr)
 
   let manifest = loadMarketManifest()
 
@@ -73,13 +75,7 @@ function monitorMarket (_market: Address): void {
   let updated = market.updated()
   let updatePeriod = market.updatePeriod()
 
-  log.info("\n\nmarket: {}\ncompoundPeriod: {}\nupdatePeriod: {}", [
-      _market.toHexString(),
-      compoundPeriod.toString(),
-      updatePeriod.toString()
-  ])
-
-  markets.push(market._address)
+  markets.push(_market)
   compoundings.push(compounded.plus(compoundPeriod))
   updates.push(updated.plus(updatePeriod))
 
@@ -104,13 +100,13 @@ export function loadPosition(
 
 		position = new Position(positionId)
 
-		position.collateralManager = collateralManager.address.toHexString()
+		position.collateralManager = collateralManager.address
 		position.number = id
 		position.totalSupply = BigInt.fromI32(0)
 
-        position.save()
+    position.save()
 
-        monitorPosition(market, position)
+    monitorPosition(market, position)
 
 	}
 
@@ -167,11 +163,11 @@ export function loadBalanceOVL(account: Address): BalanceOVL {
 
 }
 
-export function countPricePoint (market: Address): string {
+export function countPricePoint (market: string): string {
 
-    let count = PricePointCount.load(market.toHexString())
+    let count = PricePointCount.load(market)
 
-    if (count == null) count = new PricePointCount(market.toHexString())
+    if (count == null) count = new PricePointCount(market)
 
     let number = count.count;
 
@@ -185,12 +181,12 @@ export function countPricePoint (market: Address): string {
 
 
 export function loadPricePoint (
-    _market: Address, 
+    _market: string, 
     _pricePoint: string, 
     _type: string
 ): PricePoint|null {
 
-    let pricePointId = _market.toHexString().concat('-').concat(_pricePoint)
+    let pricePointId = _market.concat('-').concat(_pricePoint)
 
     let pricePoint = PricePoint.load(pricePointId)
 
@@ -203,7 +199,7 @@ export function loadPricePoint (
 
         } else ("current" == _type || _type == "liquidation") {
 
-            let market = OverlayV1UniswapV3Market.bind(_market)
+            let market = OverlayV1UniswapV3Market.bind(Address.fromHexString(_market) as Address)
 
             let tryPricePoint = market.try_pricePoints(BigInt.fromString(_pricePoint))
 
@@ -214,7 +210,7 @@ export function loadPricePoint (
                 pricePoint.ask = tryPricePoint.value.ask
                 pricePoint.index = tryPricePoint.value.index
                 pricePoint.number = BigInt.fromString(_pricePoint)
-                pricePoint.market = _market.toHexString()
+                pricePoint.market = _market
                 pricePoint.save()
 
             }
@@ -248,7 +244,7 @@ export function loadAccount(address: Address): Account {
   if (account == null) {
     
     account = new Account(accountId)
-    account.address = address
+    account.address = address.toHexString()
     account.save()
 
   }
@@ -266,7 +262,7 @@ export function loadCollateralManager(address: Address): CollateralManager {
   if (collateralManager == null) {
 
     collateralManager = new CollateralManager(collateralId)
-    collateralManager.address = address
+    collateralManager.address = address.toHexString()
     collateralManager.save()
 
   }

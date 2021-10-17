@@ -30,11 +30,11 @@ export function handleFundingPaid(event: FundingPaid): void { }
 
 export function handleNewPrice(event: NewPrice): void {
 
-  loadMarket(event.address)
+  loadMarket(event.address.toHexString())
 
-  let number = countPricePoint(event.address)
+  let number = countPricePoint(event.address.toHexString())
 
-  let pricePoint = loadPricePoint( event.address, number, "event") as PricePoint
+  let pricePoint = loadPricePoint( event.address.toHexString(), number, "event") as PricePoint
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
@@ -56,11 +56,11 @@ export function handleBlock(block: ethereum.Block): void {
 
   for (let i = 0; i < manifest.markets.length; i++) {
 
-    let marketAddr = Address.fromByteArray(markets[i]) as Address
+    let marketAddr = markets[i]
     let compounding = compoundings[i]
     let update = updates[i]
 
-    let marketInstance = OverlayV1UniswapV3Market.bind(marketAddr)
+    let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromHexString(marketAddr) as Address)
 
     let oi = marketInstance.oi()
     let oiCap = marketInstance.oiCap()
@@ -125,7 +125,7 @@ function remasterLiquidations (
 
     let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 
-    let pricePoint = loadPricePoint( marketAddr, position.pricePoint, "liquidation" )
+    let pricePoint = loadPricePoint( market.id, position.pricePoint, "liquidation" )
 
     if (pricePoint == null) continue
 

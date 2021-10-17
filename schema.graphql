@@ -1,8 +1,8 @@
 type Position @entity {
   id: ID!
   number: BigInt!
-  collateralManager: Bytes!
-  market: Bytes!
+  collateralManager: CollateralManager!
+  market: Market!
   isLong: Boolean!
   leverage: BigInt!
   pricePoint: PricePoint! 
@@ -16,18 +16,20 @@ type Position @entity {
 
 type CollateralManager @entity {
   id: ID!
-  address: Bytes!
+  address: String!
+  positions: [ Position! ]! @derivedFrom(field: "collateralManager")
 }
 
 type Account @entity {
   id: ID!
-  address: Bytes!
+  address: String!
   balances: [Balance!]! @derivedFrom(field: "account")
   balanceOVL: BalanceOVL! @derivedFrom(field: "account")
 }
 
 type PricePoint @entity {
   id: ID!
+  market: Market!
   number: BigInt!
   bid: BigInt!
   ask: BigInt!
@@ -48,7 +50,6 @@ type Market @entity {
   quoteName: String!
   baseSymbol: String!
   quoteSymbol: String!
-  # prices: [ PricePoint! ]! @derivedFrom(field: "id")
   oiLong: BigInt!
   oiLongShares: BigInt!
   oiLongQueued: BigInt!
@@ -79,7 +80,7 @@ type BalanceOVL @entity {
 
 type MarketManifest @entity {
   id: ID!
-  markets: [ Bytes! ]!
+  markets: [ String! ]!
   compoundings: [ BigInt! ]!
   updates: [ BigInt! ]!
 }

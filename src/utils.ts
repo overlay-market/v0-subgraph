@@ -238,15 +238,15 @@ export function loadPricePoint (
 
       if (!tryPricePoint.reverted) {
 
-          pricePoint = new PricePoint(pricePointId)
-          pricePoint.bid = tryPricePoint.value.bid
-          pricePoint.ask = tryPricePoint.value.ask
-          pricePoint.index = tryPricePoint.value.index
-          pricePoint.number = number
-          pricePoint.market = _market
-          pricePoint.save()
+        pricePoint = new PricePoint(pricePointId)
+        pricePoint.bid = tryPricePoint.value.bid
+        pricePoint.ask = tryPricePoint.value.ask
+        pricePoint.index = tryPricePoint.value.index
+        pricePoint.number = number
+        pricePoint.market = _market
+        pricePoint.save()
 
-          countPricePoint(_market)
+        countPricePoint(_market)
 
       }
 

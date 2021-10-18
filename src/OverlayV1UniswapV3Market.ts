@@ -88,7 +88,7 @@ export function handleBlock(block: ethereum.Block): void {
 
     if (now > compounding) {
 
-      remasterLiquidations(market, oi)
+      remasterLiquidations(now, market, oi)
 
       compoundings[i] = compounding.plus(market.compoundingPeriod)
 
@@ -105,6 +105,7 @@ export function handleBlock(block: ethereum.Block): void {
 }
 
 function remasterLiquidations (
+  now: BigInt,
   market: Market,
   oi: OverlayV1UniswapV3Market__oiResult
 ): void {
@@ -118,6 +119,12 @@ function remasterLiquidations (
   for (let j = 0; j < positions.length; j++) {
 
     let position = Position.load(positions[j]) as Position
+
+    if ( 
+      now < position.compounding || 
+      position.oiShares == BigInt.fromI32(0) 
+    ) continue
+
 
     let collateralManager = OverlayV1OVLCollateral.bind(Address.fromString(position.collateralManager))
 

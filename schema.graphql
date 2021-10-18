@@ -43,6 +43,7 @@ type PricePointCount @entity {
 
 type Market @entity {
   id: ID!
+  created: BigInt!
   feed: Bytes!
   base: Bytes!
   quote: Bytes!

@@ -184,46 +184,72 @@ export function countPricePoint (market: string): string {
 
 export function loadPricePoint (
     _market: string, 
-    _pricePoint: string, 
-    _type: string
+    _type: string,
+    _pricePoint: string,
+    _now: BigInt = BigInt.fromI32(0)
 ): PricePoint|null {
 
-    let pricePointId = _market.concat('-').concat(_pricePoint)
+  let pricePointId = _market.concat('-').concat(_pricePoint)
+
+  if (_type == "event") {
+
+    let number = countPricePoint(_market)
+    let pricePoint = new PricePoint(pricePointId)
+    pricePoint.number = BigInt.fromString(number)
+    return pricePoint
+
+  }
+
+  let market = OverlayV1UniswapV3Market.bind(Address.fromString(_market))
+
+  if (_type == "current") {
+
+    let pricePoint = PricePoint.load(pricePointId)
+    if (pricePoint == null) pricePoint = new PricePoint(pricePointId)
+
+    // let epochs = market.epochs()
+
+    // let tUpdate = epochs.value2
+
+    // let price = market.price(_now.minus(tUpdate))
+
+    // pricePoint.bid = price.bid
+    // pricePoint.ask = price.ask
+    // pricePoint.index = price.index
+
+    pricePoint.save()
+
+    return pricePoint
+
+  } else if (_type == "liquidation") {
 
     let pricePoint = PricePoint.load(pricePointId)
 
     if (pricePoint == null) {
 
-        if (_type == "event") {
+      let tryPricePoint = market.try_pricePoints(BigInt.fromString(_pricePoint))
 
-            pricePoint = new PricePoint(pricePointId)
-            pricePoint.number = BigInt.fromString(_pricePoint)
+      if (!tryPricePoint.reverted) {
 
-        } else ("current" == _type || _type == "liquidation") {
+          pricePoint = new PricePoint(pricePointId)
+          pricePoint.bid = tryPricePoint.value.bid
+          pricePoint.ask = tryPricePoint.value.ask
+          pricePoint.index = tryPricePoint.value.index
+          pricePoint.number = BigInt.fromString(_pricePoint)
+          pricePoint.market = _market
+          pricePoint.save()
 
-            let market = OverlayV1UniswapV3Market.bind(Address.fromString(_market))
+          countPricePoint(_market)
 
-            let tryPricePoint = market.try_pricePoints(BigInt.fromString(_pricePoint))
-
-            if (!tryPricePoint.reverted) {
-
-                pricePoint = new PricePoint(pricePointId)
-                pricePoint.bid = tryPricePoint.value.bid
-                pricePoint.ask = tryPricePoint.value.ask
-                pricePoint.index = tryPricePoint.value.index
-                pricePoint.number = BigInt.fromString(_pricePoint)
-                pricePoint.market = _market
-                pricePoint.save()
-
-            }
-
-            if (_type == "liquidation") countPricePoint(_market)
-
-        }
+      }
 
     }
 
     return pricePoint
+
+  }
+
+  return null
 
 }
 

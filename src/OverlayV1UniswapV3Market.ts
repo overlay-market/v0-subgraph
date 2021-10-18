@@ -32,9 +32,7 @@ export function handleNewPrice(event: NewPrice): void {
 
   loadMarket(event.address.toHexString(), event.block.number)
 
-  let number = countPricePoint(event.address.toHexString())
-
-  let pricePoint = loadPricePoint( event.address.toHexString(), number, "event") as PricePoint
+  let pricePoint = loadPricePoint( event.address.toHexString(), "event", "event") as PricePoint
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
@@ -80,12 +78,9 @@ export function handleBlock(block: ethereum.Block): void {
 
     market.oiCap = oiCap
 
-
     if (update < now ) {
 
-      let pricePoint = loadPricePoint( marketAddr, "none", "current" ) as PricePoint
-
-      market.currentPrice = pricePoint.id
+      loadPricePoint( marketAddr, "current", "current", block.timestamp ) as PricePoint
 
       updates[i] = update.plus(market.updatePeriod)
 
@@ -128,7 +123,7 @@ function remasterLiquidations (
 
     let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 
-    let pricePoint = loadPricePoint( market.id, position.pricePoint, "liquidation" )
+    let pricePoint = loadPricePoint( market.id, "liquidation", position.pricePoint )
 
     if (pricePoint == null) continue
 

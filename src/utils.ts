@@ -181,7 +181,6 @@ export function countPricePoint (market: string): string {
 
 }
 
-
 export function loadPricePoint (
     _market: string, 
     _type: string,
@@ -189,11 +188,13 @@ export function loadPricePoint (
     _now: BigInt = BigInt.fromI32(0)
 ): PricePoint|null {
 
-  let pricePointId = _market.concat('-').concat(_pricePoint)
 
   if (_type == "event") {
 
     let number = countPricePoint(_market)
+
+    let pricePointId = _market.concat('-').concat(number.toString())
+
     let pricePoint = new PricePoint(pricePointId)
     pricePoint.number = BigInt.fromString(number)
     return pricePoint
@@ -203,6 +204,8 @@ export function loadPricePoint (
   let market = OverlayV1UniswapV3Market.bind(Address.fromString(_market))
 
   if (_type == "current") {
+
+    let pricePointId = _market.concat('-current')
 
     let pricePoint = PricePoint.load(pricePointId)
     if (pricePoint == null) pricePoint = new PricePoint(pricePointId)
@@ -223,11 +226,15 @@ export function loadPricePoint (
 
   } else if (_type == "liquidation") {
 
-    let pricePoint = PricePoint.load(pricePointId)
+    let pricePoint = PricePoint.load(_pricePoint)
 
     if (pricePoint == null) {
 
-      let tryPricePoint = market.try_pricePoints(BigInt.fromString(_pricePoint))
+      let number = (PricePointCount.load(_market) as PricePointCount).count
+
+      let pricePointId = _market.concat('-').concat(number.toString())
+
+      let tryPricePoint = market.try_pricePoints(number)
 
       if (!tryPricePoint.reverted) {
 
@@ -235,7 +242,7 @@ export function loadPricePoint (
           pricePoint.bid = tryPricePoint.value.bid
           pricePoint.ask = tryPricePoint.value.ask
           pricePoint.index = tryPricePoint.value.index
-          pricePoint.number = BigInt.fromString(_pricePoint)
+          pricePoint.number = number
           pricePoint.market = _market
           pricePoint.save()
 

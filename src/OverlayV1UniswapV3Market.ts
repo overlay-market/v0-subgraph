@@ -12,7 +12,6 @@ import {
 } from "../generated/OverlayV1OVLCollateral/OverlayV1OVLCollateral"
 
 import {
-  countPricePoint,
   loadMarket,
   loadMarketManifest,
   loadMarketMonitor,
@@ -32,7 +31,7 @@ export function handleNewPrice(event: NewPrice): void {
 
   loadMarket(event.address.toHexString(), event.block.number)
 
-  let pricePoint = loadPricePoint( event.address.toHexString(), "event", "event") as PricePoint
+  let pricePoint = loadPricePoint( event.address.toHexString() ) 
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
@@ -50,13 +49,11 @@ export function handleBlock(block: ethereum.Block): void {
 
   let markets = manifest.markets 
   let compoundings = manifest.compoundings
-  let updates = manifest.updates
 
   for (let i = 0; i < manifest.markets.length; i++) {
 
     let marketAddr = markets[i]
     let compounding = compoundings[i]
-    let update = updates[i]
 
     let marketInstance = OverlayV1UniswapV3Market.bind(Address.fromString(marketAddr))
 
@@ -68,29 +65,23 @@ export function handleBlock(block: ethereum.Block): void {
 
     let oi = marketInstance.oi()
 
+    let currentPrice = loadPricePoint(marketAddr, "current")
+
     market.oiLong = oi.value0
     market.oiLongShares = oi.value2
-    market.oiLongShares = oi.value4
 
     market.oiShort = oi.value1
     market.oiShortShares = oi.value3
-    market.oiShortQueued = oi.value5
 
     market.oiCap = oiCap
 
-    if (update < now ) {
-
-      loadPricePoint( marketAddr, "current", "current", block.timestamp ) as PricePoint
-
-      updates[i] = update.plus(market.updatePeriod)
-
-    }
+    market.currentPrice = currentPrice.id
 
     if (now > compounding) {
 
-      remasterLiquidations(now, market, oi)
+      remasterLiquidations(market, currentPrice, oi)
 
-      compoundings[i] = compounding.plus(market.compoundingPeriod)
+      compoundings[i] = compounding.plus(market.compoundPeriod)
 
     }
 
@@ -99,14 +90,13 @@ export function handleBlock(block: ethereum.Block): void {
   }
 
   manifest.compoundings = compoundings
-  manifest.updates = updates
   manifest.save()
 
 }
 
 function remasterLiquidations (
-  now: BigInt,
   market: Market,
+  pricePoint: PricePoint,
   oi: OverlayV1UniswapV3Market__oiResult
 ): void {
 
@@ -120,23 +110,13 @@ function remasterLiquidations (
 
     let position = Position.load(positions[j]) as Position
 
-    if ( 
-      now < position.compounding || 
-      position.oiShares == BigInt.fromI32(0) 
-    ) continue
-
-
     let collateralManager = OverlayV1OVLCollateral.bind(Address.fromString(position.collateralManager))
 
     let marginMaintenance = morphd(collateralManager.marginMaintenance(marketAddr))
 
-    let pricePoint = loadPricePoint( market.id, "liquidation", position.pricePoint )
-
-    if (pricePoint == null) continue
-
     setLiquidationPrice(
       position, 
-      pricePoint as PricePoint, 
+      pricePoint, 
       oi, 
       marginMaintenance
     ) 

@@ -9,7 +9,6 @@ type Position @entity {
   oiShares: BigInt!
   debt: BigInt!
   cost: BigInt!
-  compounding: BigInt!
   liquidationPrice: BigDecimal!
   totalSupply: BigInt!
 }
@@ -53,13 +52,11 @@ type Market @entity {
   quoteSymbol: String!
   oiLong: BigInt!
   oiLongShares: BigInt!
-  oiLongQueued: BigInt!
   oiShort: BigInt!
   oiShortShares: BigInt!
-  oiShortQueued: BigInt!
   oiCap: BigInt!
   updatePeriod: BigInt!
-  compoundingPeriod: BigInt!
+  compoundPeriod: BigInt!
   positions: [ Position! ]! @derivedFrom(field: "market")
   prices: [ PricePoint! ]! @derivedFrom(field: "market")
   currentPrice: PricePoint!
@@ -83,7 +80,6 @@ type MarketManifest @entity {
   id: ID!
   markets: [ String! ]!
   compoundings: [ BigInt! ]!
-  updates: [ BigInt! ]!
 }
 
 type MarketMonitor @entity {

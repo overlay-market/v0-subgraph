@@ -78,11 +78,9 @@ function monitorMarket (_market: string): void {
 
   markets.push(_market)
   compoundings.push(compounded.plus(compoundPeriod))
-  updates.push(updated.plus(updatePeriod))
 
   manifest.markets = markets
   manifest.compoundings = compoundings
-  manifest.updates = updates
 
   manifest.save()
 
@@ -183,23 +181,8 @@ export function countPricePoint (market: string): string {
 
 export function loadPricePoint (
     _market: string, 
-    _type: string,
-    _pricePoint: string,
-    _now: BigInt = BigInt.fromI32(0)
-): PricePoint|null {
-
-
-  if (_type == "event") {
-
-    let number = countPricePoint(_market)
-
-    let pricePointId = _market.concat('-').concat(number.toString())
-
-    let pricePoint = new PricePoint(pricePointId)
-    pricePoint.number = BigInt.fromString(number)
-    return pricePoint
-
-  }
+    _type: string = ""
+): PricePoint {
 
   let market = OverlayV1UniswapV3Market.bind(Address.fromString(_market))
 
@@ -210,53 +193,29 @@ export function loadPricePoint (
     let pricePoint = PricePoint.load(pricePointId)
     if (pricePoint == null) pricePoint = new PricePoint(pricePointId)
 
-    // let epochs = market.epochs()
+    let price = market.price()
 
-    // let tUpdate = epochs.value2
-
-    // let price = market.price(_now.minus(tUpdate))
-
-    // pricePoint.bid = price.bid
-    // pricePoint.ask = price.ask
-    // pricePoint.index = price.index
+    pricePoint.bid = price.bid
+    pricePoint.ask = price.ask
+    pricePoint.index = price.index
 
     pricePoint.save()
 
     return pricePoint
 
-  } else if (_type == "liquidation") {
+  } else {
 
-    let pricePoint = PricePoint.load(_pricePoint)
+    let number = countPricePoint(_market)
 
-    if (pricePoint == null) {
+    let pricePointId = _market.concat('-').concat(number.toString())
 
-      let number = (PricePointCount.load(_market) as PricePointCount).count
+    let pricePoint = new PricePoint(pricePointId)
 
-      let pricePointId = _market.concat('-').concat(number.toString())
-
-      let tryPricePoint = market.try_pricePoints(number)
-
-      if (!tryPricePoint.reverted) {
-
-        pricePoint = new PricePoint(pricePointId)
-        pricePoint.bid = tryPricePoint.value.bid
-        pricePoint.ask = tryPricePoint.value.ask
-        pricePoint.index = tryPricePoint.value.index
-        pricePoint.number = number
-        pricePoint.market = _market
-        pricePoint.save()
-
-        countPricePoint(_market)
-
-      }
-
-    }
+    pricePoint.number = BigInt.fromString(number)
 
     return pricePoint
 
   }
-
-  return null
 
 }
 

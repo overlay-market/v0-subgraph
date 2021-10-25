@@ -56,7 +56,6 @@ export function handleBuild(event: Build): void {
   position.oiShares = positionStruct.value4
   position.debt = positionStruct.value5
   position.cost = positionStruct.value6
-  position.compounding = positionStruct.value7
 
   position.save()
 

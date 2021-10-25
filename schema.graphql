@@ -58,12 +58,14 @@ type Market @entity {
   updatePeriod: BigInt!
   compoundPeriod: BigInt!
   positions: [ Position! ]! @derivedFrom(field: "market")
+  positionBalances: [ Balance! ]! @derivedFrom(field:"market")
   prices: [ PricePoint! ]! @derivedFrom(field: "market")
   currentPrice: PricePoint!
 }
 
 type Balance @entity {
   id: ID!
+  market: Market!
   account: Account!
   position: BigInt!
   shares: BigInt!

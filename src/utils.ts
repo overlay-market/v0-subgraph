@@ -68,13 +68,9 @@ function monitorMarket (_market: string): void {
 
   let markets = manifest.markets
   let compoundings = manifest.compoundings
-  let updates = manifest.updates
 
   let compounded = market.compounded()
   let compoundPeriod = market.compoundingPeriod()
-
-  let updated = market.updated()
-  let updatePeriod = market.updatePeriod()
 
   markets.push(_market)
   compoundings.push(compounded.plus(compoundPeriod))

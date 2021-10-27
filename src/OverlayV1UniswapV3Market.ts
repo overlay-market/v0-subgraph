@@ -79,9 +79,9 @@ export function handleBlock(block: ethereum.Block): void {
 
     if (now > compounding) {
 
-      remasterLiquidations(market, currentPrice, oi)
+      // remasterLiquidations(market, currentPrice, oi)
 
-      compoundings[i] = compounding.plus(market.compoundPeriod)
+      // compoundings[i] = compounding.plus(market.compoundPeriod)
 
     }
 

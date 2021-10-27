@@ -6,7 +6,7 @@ dataSources:
     name: OverlayV1OVLCollateral
     network: development
     source:
-      address: "0x7a2b48e48593920DDd2d5084C012504fe396782F"
+      address: "0xc3D73beec840D95b0B70c660A9b8BE2996B0cC17"
       abi: OverlayV1OVLCollateral
     mapping:
       kind: ethereum/events
@@ -47,7 +47,7 @@ dataSources:
     name: OverlayV1UniswapV3Market
     network: development
     source:
-      address: "0x58A5D9C7B39516DC588eE69BB07Fbd78aBc1d4E7"
+      address: "0x6f49162bC17EbA2B926f789522269A0e0F2A5884"
       abi: OverlayV1UniswapV3Market
     mapping:
       kind: ethereum/events
@@ -74,7 +74,7 @@ dataSources:
     name: OverlayV1Mothership
     network: development
     source:
-      address: "0x8b88Db65382385cA16291899621be302338ADCa7"
+      address: "0xE15Ed9eb485Ec1B95c6F853cB57901629b0f1CF2"
       abi: OverlayV1Mothership
     mapping:
       kind: ethereum/events
@@ -100,7 +100,7 @@ dataSources:
     name: OverlayToken
     network: development
     source:
-      address: "0xDAE19a4B165d4800834D64b40593Cbd80454AAa0"
+      address: "0x04346e29fDef5dc5A7822793d9f00B5db73D6532"
       abi: OverlayToken
     mapping:
       kind: ethereum/events

@@ -2,6 +2,7 @@ type Position @entity {
   id: ID!
   number: BigInt!
   collateralManager: CollateralManager!
+  balances: [ Balance! ]! @derivedFrom(field: "position")
   market: Market!
   isLong: Boolean!
   leverage: BigInt!
@@ -67,7 +68,7 @@ type Balance @entity {
   id: ID!
   market: Market!
   account: Account!
-  position: BigInt!
+  position: Position!
   shares: BigInt!
 }
 

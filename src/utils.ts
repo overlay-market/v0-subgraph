@@ -132,7 +132,7 @@ export function loadBalance(position: Position, account: Account): Balance {
   if (balance == null) {
 
     balance = new Balance(balanceid);
-    balance.position = position.number;
+    balance.position = position.id;
     balance.account = account.id;
     balance.shares = BigInt.fromI32(0)
 

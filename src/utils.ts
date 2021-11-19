@@ -111,8 +111,10 @@ export function loadPosition(
 }
 
 function monitorPosition(market: string, position: Position): void {
+  
+    let marketAddr = Address.fromString(market)
 
-    let monitor = MarketMonitor.load(market) as MarketMonitor
+    let monitor = loadMarketMonitor(marketAddr)
 
     let positions = monitor.positions
 

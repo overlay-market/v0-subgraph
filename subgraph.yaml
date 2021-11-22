@@ -55,7 +55,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - FundingPaid
-        - NewPrice
+        - NewPricePoint
       abis:
         - name: OverlayV1UniswapV3Market
           file: ./abis/OverlayV1UniswapV3Market.json
@@ -64,8 +64,8 @@ dataSources:
       eventHandlers:
         - event: FundingPaid(uint256,uint256,int256)
           handler: handleFundingPaid
-        - event: NewPrice(uint256,uint256,uint256)
-          handler: handleNewPrice
+        - event: NewPricePoint(uint256,uint256,uint256)
+          handler: handleNewPricePoint
       blockHandlers:
         - handler: handleBlock
       file: ./src/OverlayV1UniswapV3Market.ts

@@ -27,7 +27,7 @@ import {
 
 export function handleFundingPaid(event: FundingPaid): void { }
 
-export function handleNewPrice(event: NewPricePoint): void {
+export function handleNewPricePoint(event: NewPricePoint): void {
 
   loadMarket(event.address.toHexString(), event.block.number)
 

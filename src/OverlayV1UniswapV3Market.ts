@@ -35,7 +35,7 @@ export function handleNewPrice(event: NewPricePoint): void {
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
-  pricePoint.index = event.params.depth
+  pricePoint.depth = event.params.depth
 
   pricePoint.save()
 
@@ -171,15 +171,15 @@ function _liquidationPrice (
   let cost = morphd(position.cost)
   let debt = morphd(position.debt)
 
-  let oi = oiShares * totalOi / totalOiShares;
-  let initialOi = cost + debt;
+  // let oi = oiShares * totalOi / totalOiShares;
+  // let initialOi = cost + debt;
 
-  let _oiFrame = ( ( initialOi * marginMaintenance ) + debt ) / oi
+  // let _oiFrame = ( ( initialOi * marginMaintenance ) + debt ) / oi
 
   let liquidationPrice = BigInt.fromI32(0).toBigDecimal()
 
-  if (position.isLong) liquidationPrice = entryPrice * _oiFrame;
-  else liquidationPrice = entryPrice * ( BigInt.fromI32(2).toBigDecimal() - _oiFrame );
+  // if (position.isLong) liquidationPrice = entryPrice * _oiFrame;
+  // else liquidationPrice = entryPrice * ( BigInt.fromI32(2).toBigDecimal() - _oiFrame );
 
   return liquidationPrice
             

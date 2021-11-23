@@ -2,11 +2,11 @@ type Position @entity {
   id: ID!
   number: BigInt!
   collateralManager: CollateralManager!
-  balances: [ Balance! ]! @derivedFrom(field: "position")
+  balances: [Balance!]! @derivedFrom(field: "position")
   market: Market!
   isLong: Boolean!
   leverage: BigInt!
-  pricePoint: PricePoint! 
+  pricePoint: PricePoint!
   oiShares: BigInt!
   debt: BigInt!
   cost: BigInt!
@@ -17,7 +17,7 @@ type Position @entity {
 type CollateralManager @entity {
   id: ID!
   address: String!
-  positions: [ Position! ]! @derivedFrom(field: "collateralManager")
+  positions: [Position!]! @derivedFrom(field: "collateralManager")
 }
 
 type Account @entity {
@@ -33,7 +33,7 @@ type PricePoint @entity {
   number: BigInt!
   bid: BigInt!
   ask: BigInt!
-  index: BigInt!
+  depth: BigInt!
 }
 
 type PricePointCount @entity {
@@ -58,9 +58,9 @@ type Market @entity {
   oiCap: BigInt!
   updatePeriod: BigInt!
   compoundPeriod: BigInt!
-  positions: [ Position! ]! @derivedFrom(field: "market")
-  positionBalances: [ Balance! ]! @derivedFrom(field:"market")
-  prices: [ PricePoint! ]! @derivedFrom(field: "market")
+  positions: [Position!]! @derivedFrom(field: "market")
+  positionBalances: [Balance!]! @derivedFrom(field: "market")
+  prices: [PricePoint!]! @derivedFrom(field: "market")
   currentPrice: PricePoint!
 }
 
@@ -81,11 +81,11 @@ type BalanceOVL @entity {
 
 type MarketManifest @entity {
   id: ID!
-  markets: [ String! ]!
-  compoundings: [ BigInt! ]!
+  markets: [String!]!
+  compoundings: [BigInt!]!
 }
 
 type MarketMonitor @entity {
   id: ID!
-  positions: [ Position! ]!
+  positions: [Position!]!
 }

@@ -191,9 +191,9 @@ export function loadPricePoint (
     let pricePoint = PricePoint.load(pricePointId)
     if (pricePoint == null) pricePoint = new PricePoint(pricePointId)
 
-    let price = market.price()
+    let price = market.pricePointCurrent()
 
-    pricePoint.bid = price.bid
+    pricePoint.bid = price.bid_
     pricePoint.ask = price.ask
     pricePoint.index = price.index
 

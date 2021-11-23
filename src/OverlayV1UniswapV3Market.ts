@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotoco
 
 import {
   FundingPaid,
-  NewPrice,
+  NewPricePoint,
   OverlayV1UniswapV3Market,
   OverlayV1UniswapV3Market__oiResult
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
@@ -27,7 +27,7 @@ import {
 
 export function handleFundingPaid(event: FundingPaid): void { }
 
-export function handleNewPrice(event: NewPrice): void {
+export function handleNewPrice(event: NewPricePoint): void {
 
   loadMarket(event.address.toHexString(), event.block.number)
 
@@ -35,7 +35,7 @@ export function handleNewPrice(event: NewPrice): void {
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
-  pricePoint.index = event.params.index
+  pricePoint.index = event.params.depth
 
   pricePoint.save()
 

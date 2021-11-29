@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotoco
 
 import {
   FundingPaid,
-  NewPrice,
+  NewPricePoint,
   OverlayV1UniswapV3Market,
   OverlayV1UniswapV3Market__oiResult
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
@@ -27,7 +27,7 @@ import {
 
 export function handleFundingPaid(event: FundingPaid): void { }
 
-export function handleNewPrice(event: NewPrice): void {
+export function handleNewPricePoint(event: NewPricePoint): void {
 
   loadMarket(event.address.toHexString(), event.block.number)
 
@@ -35,7 +35,7 @@ export function handleNewPrice(event: NewPrice): void {
 
   pricePoint.bid = event.params.bid
   pricePoint.ask = event.params.ask
-  pricePoint.index = event.params.index
+  pricePoint.depth = event.params.depth
 
   pricePoint.save()
 
@@ -171,15 +171,15 @@ function _liquidationPrice (
   let cost = morphd(position.cost)
   let debt = morphd(position.debt)
 
-  let oi = oiShares * totalOi / totalOiShares;
-  let initialOi = cost + debt;
+  // let oi = oiShares * totalOi / totalOiShares;
+  // let initialOi = cost + debt;
 
-  let _oiFrame = ( ( initialOi * marginMaintenance ) + debt ) / oi
+  // let _oiFrame = ( ( initialOi * marginMaintenance ) + debt ) / oi
 
   let liquidationPrice = BigInt.fromI32(0).toBigDecimal()
 
-  if (position.isLong) liquidationPrice = entryPrice * _oiFrame;
-  else liquidationPrice = entryPrice * ( BigInt.fromI32(2).toBigDecimal() - _oiFrame );
+  // if (position.isLong) liquidationPrice = entryPrice * _oiFrame;
+  // else liquidationPrice = entryPrice * ( BigInt.fromI32(2).toBigDecimal() - _oiFrame );
 
   return liquidationPrice
             

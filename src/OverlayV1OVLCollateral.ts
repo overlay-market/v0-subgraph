@@ -13,7 +13,7 @@ import {
 import {
   OverlayV1UniswapV3Market,
   FundingPaid,
-  NewPrice
+  NewPricePoint
 } from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import { 
@@ -166,4 +166,4 @@ export function handleUpdate(event: Update): void {}
 
 export function handleFundingPaid(event: FundingPaid): void {}
 
-export function handleNewPrice(event: NewPrice): void {}
+export function handleNewPricePoint(event: NewPricePoint): void {}

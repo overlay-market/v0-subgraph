@@ -100,6 +100,8 @@ export function loadPosition(
 		position.number = id
 		position.totalSupply = BigInt.fromI32(0)
 
+    position.market = loadMarket(market).id
+
     position.save()
 
     monitorPosition(market, position)

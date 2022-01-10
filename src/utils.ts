@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts"
 
 import {
   OverlayV1UniswapV3Market,
-} from "../generated/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
+} from "../generated/templates/OverlayV1UniswapV3Market/OverlayV1UniswapV3Market"
 
 import {
     Account,

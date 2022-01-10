@@ -97,6 +97,7 @@ export function loadPosition(
 		position = new Position(positionId)
 
 		position.collateralManager = collateralManager.address
+    position.market = market
 		position.number = id
 		position.totalSupply = BigInt.fromI32(0)
 
